@@ -1,17 +1,20 @@
 package xyz.monkeytong.hongbao.utils;
 
+import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 /**
  * Created by Zhongyi on 1/21/16.
  */
 public class HongbaoSignature {
+    private static final String TAG = "HongbaoSignature";
     private String sender, content, time;
 
     public boolean generateSignature(AccessibilityNodeInfo node) {
         try {
             AccessibilityNodeInfo hongbaoNode = node.getParent();
             String hongbaoContent = hongbaoNode.getChild(0).getText().toString();
+            Log.e(TAG, "HongbaoContent is " + hongbaoContent);
 
             if (hongbaoContent == null) return false;
 
@@ -59,6 +62,8 @@ public class HongbaoSignature {
                 if (thisNodeText != null) result[1] = thisNodeText.toString();
             }
         }
+
+        Log.e(TAG, "result is " + result[0] + " : " + result[1]);
         return result;
     }
 

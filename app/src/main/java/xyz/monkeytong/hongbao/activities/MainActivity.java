@@ -8,12 +8,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
 import xyz.monkeytong.hongbao.R;
 import xyz.monkeytong.hongbao.utils.UpdateTask;
 
@@ -21,36 +23,43 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity
+{
     private final Intent mAccessibleIntent =
             new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
 
     private Button switchPlugin;
 
+    public static final String TAG = "MainActivyt";
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         switchPlugin = (Button) findViewById(R.id.button_accessible);
 
-        handleMIUIStatusBar();
+        Log.i(TAG, "MainActivity oncreated");
+        //handleMIUIStatusBar();
         updateServiceStatus();
 
         explicitlyLoadPreferences();
     }
 
-    private void explicitlyLoadPreferences() {
+    private void explicitlyLoadPreferences()
+    {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
     /**
      * 适配MIUI沉浸状态栏
      */
-    private void handleMIUIStatusBar() {
+    private void handleMIUIStatusBar()
+    {
         Window window = getWindow();
 
         Class clazz = window.getClass();
-        try {
+        try
+        {
             int tranceFlag = 0;
             Class layoutParams = Class.forName("android.view.MiuiWindowManager$LayoutParams");
 
@@ -63,13 +72,16 @@ public class MainActivity extends Activity {
             ImageView placeholder = (ImageView) findViewById(R.id.main_actiob_bar_placeholder);
             int placeholderHeight = getStatusBarHeight();
             placeholder.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, placeholderHeight));
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             // Do nothing
         }
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
         updateServiceStatus();
 
@@ -78,48 +90,62 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
     }
 
-    private void updateServiceStatus() {
+    private void updateServiceStatus()
+    {
         boolean serviceEnabled = false;
 
         AccessibilityManager accessibilityManager =
                 (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
         List<AccessibilityServiceInfo> accessibilityServices =
                 accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC);
-        for (AccessibilityServiceInfo info : accessibilityServices) {
-            if (info.getId().equals(getPackageName() + "/.services.HongbaoService")) {
+        for (AccessibilityServiceInfo info : accessibilityServices)
+        {
+            if (info.getId().equals(getPackageName() + "/.services.HongbaoService"))
+            {
                 serviceEnabled = true;
                 break;
             }
         }
 
-        if (serviceEnabled) {
+        if (serviceEnabled)
+        {
             switchPlugin.setText(R.string.service_off);
-        } else {
+        }
+        else
+        {
             switchPlugin.setText(R.string.service_on);
         }
     }
 
-    public void onButtonClicked(View view) {
+    public void onButtonClicked(View view)
+    {
         startActivity(mAccessibleIntent);
     }
 
-    public void openGithub(View view) {
+    public void openGithub(View view)
+    {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/geeeeeeeeek/WeChatLuckyMoney"));
         startActivity(browserIntent);
     }
 
-    public void openSettings(View view) {
+    public void openSettings(View view)
+    {
         Intent settingsIntent = new Intent(this, SettingsActivity.class);
         startActivity(settingsIntent);
     }
 
-    public int getStatusBarHeight() {
+    public int getStatusBarHeight()
+    {
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) return getResources().getDimensionPixelSize(resourceId);
+        if (resourceId > 0)
+        {
+            return getResources().getDimensionPixelSize(resourceId);
+        }
         return 0;
     }
 }
